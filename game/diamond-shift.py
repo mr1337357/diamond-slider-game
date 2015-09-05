@@ -7,8 +7,10 @@ def separate_gems(gems):
   size=gems.get_height()
   count=gems.get_width()/gems.get_height()
   for c in xrange(count):
-    s= pygame.Surface((size,size)).convert_alpha()
+    s= pygame.Surface((size,size),pygame.SRCALPHA, 32).convert_alpha()
     s.blit(gems,(0,0),pygame.Rect(c*size,0,(c+1)*size,size))
+    #print pygame.Rect(c*size,0,(c+1)*size,size)
+    #s=gems.subsurface(pygame.Rect(c*size,0,(c+1)*size,size))
     ng.append(s)
   return ng
 
@@ -40,7 +42,7 @@ while 1:
   screen.fill(0)
   screen.blit(cursor,(gemsize*xcurs,gemsize*ycurs))
   f.redraw()
-  screen.blit(cursor,(gemsize*xcurs,gemsize*ycurs))
+  #screen.blit(cursor,(gemsize*xcurs,gemsize*ycurs))
   pygame.display.flip()
   
   for event in pygame.event.get():
@@ -53,7 +55,7 @@ while 1:
         if ycurs > 0:
           ycurs -= 1
       if event.key == pygame.K_DOWN:
-        if ycurs < 8:
+        if ycurs < 7:
           ycurs += 1
       if event.key == pygame.K_LEFT:
         if xcurs > 0:
