@@ -1,0 +1,8 @@
+[Desktop Entry]
+
+Type=Application
+Name=Diamond Slider
+Comment=Slide Diamonds to destroy them
+Exec=rungame
+Icon=icon.png
+Categories=games;
