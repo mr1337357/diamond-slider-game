@@ -61,6 +61,9 @@ class field(object):
           if rmmap[x][y]:
             r = True
             self.map[x][y] = 0
+    self.screen.fill(0)
+    self.redraw()
+    pygame.display.flip()
     return r
 
   def redraw(self):

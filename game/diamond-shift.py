@@ -37,14 +37,6 @@ cursor.fill(grey)
 while f.check_for_winners():
   f.fill()
 while 1:
-  while f.check_for_winners():
-    f.fill()
-  screen.fill(0)
-  screen.blit(cursor,(gemsize*xcurs,gemsize*ycurs))
-  f.redraw()
-  #screen.blit(cursor,(gemsize*xcurs,gemsize*ycurs))
-  pygame.display.flip()
-  
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       import sys; sys.exit()
@@ -71,3 +63,10 @@ while 1:
         f.check_swap(xcurs,ycurs,'u')
       if event.key == pygame.K_LALT:
         f.check_swap(xcurs,ycurs,'d')
+    while f.check_for_winners():
+      f.fill()
+    screen.fill(0)
+    screen.blit(cursor,(gemsize*xcurs,gemsize*ycurs))
+    f.redraw()
+    #screen.blit(cursor,(gemsize*xcurs,gemsize*ycurs))
+    pygame.display.flip()
