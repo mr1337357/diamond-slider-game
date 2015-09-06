@@ -2,8 +2,8 @@
 import pygame
 from field import field
 
-xoffset=11
-yoffset=24
+xoffset=10
+yoffset=20
 xcurs=0
 ycurs=0
 

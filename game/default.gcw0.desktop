@@ -4,5 +4,5 @@ Type=Application
 Name=Diamond Slider
 Comment=Slide Diamonds to destroy them
 Exec=diamond-shift.py
-Icon=icon.png
+Icon=icon
 Categories=games;
