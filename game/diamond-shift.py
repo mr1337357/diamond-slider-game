@@ -19,16 +19,19 @@ def separate_gems(gems):
     ng.append(s)
   return ng
 
-def drawcb(s,g,m):
+def gem_idx(idx):
+  if idx is None:
+    return 0
+  return idx
+
+def drawcb(s,g,m,w,h):
   global gemsize
-  w=len(m)
-  h=len(m[0])
   size=g[0].get_width()
   s.blit(bg,(0,0))
   s.blit(cursor,(xoffset+gemsize*xcurs,yoffset+gemsize*ycurs))
   for x in xrange(w):
     for y in xrange(h):
-      s.blit(gems[m[x][y]],(xoffset+x*size,yoffset+y*size))
+      s.blit(gems[gem_idx(m.get((x,y), 0))],(xoffset+x*size,yoffset+y*size))
   pygame.display.flip()
 
 
