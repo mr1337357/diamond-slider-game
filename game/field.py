@@ -8,9 +8,6 @@ import pygame
 def donothing(*args,**kwargs):
   pass
 
-def empty_map(w,h):
-  return dict.fromkeys(sum(map(lambda x: zip([x] * 10, range(10)), range(10)), []), None)
-
 class field(object):
   def __init__(self,width,height,ngems,gems=None,screen=None,drawcb=None):
     self.screen=screen
@@ -18,11 +15,18 @@ class field(object):
     self.ngems=ngems
     self.width=width
     self.height=height
-    self.map=empty_map(width, height)
+    self.map={}
     self.drawcb=drawcb
     if not drawcb:
       self.drawcb=donothing
     self.fill()
+
+  def place(self, x, y, v):
+    if v is None:
+      if (x,y) in self.map:
+        del self.map[x,y]
+    else:
+       self.map[x,y]=v
 
   def fill(self):
     done=False
@@ -30,22 +34,22 @@ class field(object):
       done=True
       for x in xrange(self.width):
         for y in reversed(xrange(1,self.height,1)):
-          if not self.map.get((x,y)):
+          if not (x,y) in self.map:
             done=False
-            self.map[x,y]=self.map.get((x,y-1))
-            self.map[x,y-1]=None
+            self.place(x,y,self.map.get((x,y-1)))
+            self.place(x,y-1,None)
       for x in xrange(self.width):
-        if not self.map.get((x,0)):
+        if not (x,0) in self.map:
           done=False
           self.map[x,0] = random.randint(1,self.ngems)
       self.drawcb(self.screen,self.gems,self.map,self.width,self.height)
       pygame.time.delay(100)
-  
+
   def check_for_winners(self):
     done=False
     r=False
     while not done:
-      rmmap=empty_map(self.width, self.height)
+      rmmap={}
       done=True
       for x in xrange(self.width):
         for y in xrange(self.height):
@@ -61,9 +65,9 @@ class field(object):
               rmmap[x+2,y]=1
       for x in xrange(self.width):
         for y in xrange(self.height):
-          if rmmap.get((x,y)):
+          if (x,y) in rmmap:
             r = True
-            self.map[x,y] = None
+            self.place(x,y,None)
     #self.screen.fill(0)
     self.redraw()
     pygame.display.flip()
@@ -76,29 +80,22 @@ class field(object):
     def swap(u, v, ok=True):
       if ok:
         t=self.map.get((x,y))
-        self.map[x,y]=self.map.get((x+u,y+v))
-        self.map[x+u,y+v]=t
-
-    if d == 'u':
-      swap(0, -1, y > 0)
-    if d == 'd':
-      swap(0, 1, y < 7)
-    if d == 'l':
-      swap(-1, 0, x > 0)
-    if d == 'r':
-      swap(1, 0, x < 7)
-      
+        s=self.map.get((x+u,y+v))
+        self.place(x,y,s)
+        self.place(x+u,y+v,t)
+    def swaps():
+      if d == 'u':
+        swap(0, -1, y > 0)
+      if d == 'd':
+        swap(0, 1, y < 7)
+      if d == 'l':
+        swap(-1, 0, x > 0)
+      if d == 'r':
+        swap(1, 0, x < 7)
+    swaps()    
     self.redraw()
     pygame.display.flip()
     pygame.time.delay(150)
     if self.check_for_winners():
       return
-
-    if d == 'u':
-      swap(0, -1)
-    if d == 'd':
-      swap(0, 1)
-    if d == 'l':
-      swap(-1, 0)
-    if d == 'r':
-      swap(1, 0)
+    swaps()
