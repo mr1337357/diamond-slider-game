@@ -77,21 +77,20 @@ class field(object):
     self.drawcb(self.screen,self.gems,self.map,self.width,self.height)
 
   def check_swap(self,x,y,d):
-    def swap(u, v, ok=True):
-      if ok:
-        t=self.map.get((x,y))
-        s=self.map.get((x+u,y+v))
-        self.place(x,y,s)
-        self.place(x+u,y+v,t)
+    def swap(u, v):
+      t=self.map.get((x,y))
+      s=self.map.get((x+u,y+v))
+      self.place(x,y,s)
+      self.place(x+u,y+v,t)
     def swaps():
-      if d == 'u':
-        swap(0, -1, y > 0)
-      if d == 'd':
-        swap(0, 1, y < 7)
-      if d == 'l':
-        swap(-1, 0, x > 0)
-      if d == 'r':
-        swap(1, 0, x < 7)
+      if d == 'u' and y > 0:
+        swap(0, -1)
+      if d == 'd' and y < 7:
+        swap(0, 1)
+      if d == 'l' and x > 0:
+        swap(-1, 0)
+      if d == 'r' and x < 7:
+        swap(1, 0)
     swaps()    
     self.redraw()
     pygame.display.flip()
