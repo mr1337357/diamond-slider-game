@@ -32,12 +32,14 @@ class field(object):
     done=False
     while not done:
       done=True
+      # apply gravity
       for x in xrange(self.width):
         for y in reversed(xrange(1,self.height,1)):
           if not (x,y) in self.map:
             done=False
             self.place(x,y,self.map.get((x,y-1)))
             self.place(x,y-1,None)
+      # fill the top row
       for x in xrange(self.width):
         if not (x,0) in self.map:
           done=False
@@ -46,32 +48,29 @@ class field(object):
       pygame.time.delay(100)
 
   def check_for_winners(self):
-    done=False
-    r=False
-    while not done:
-      rmmap={}
-      done=True
-      for x in xrange(self.width):
-        for y in xrange(self.height):
-          if y < self.height-2:
-            if self.map.get((x,y)) == self.map.get((x,y+1)) == self.map.get((x,y+2)):
-              rmmap[x,y]=1
-              rmmap[x,y+1]=1
-              rmmap[x,y+2]=1
-          if x < self.width-2:
-            if self.map.get((x,y)) == self.map.get((x+1,y)) == self.map.get((x+2,y)):
-              rmmap[x,y]=1
-              rmmap[x+1,y]=1
-              rmmap[x+2,y]=1
-      for x in xrange(self.width):
-        for y in xrange(self.height):
-          if (x,y) in rmmap:
-            r = True
-            self.place(x,y,None)
+    winners=0
+    rmmap={}
+    for x in xrange(self.width):
+      for y in xrange(self.height):
+        if y < self.height-2:
+          if self.map.get((x,y)) == self.map.get((x,y+1)) == self.map.get((x,y+2)):
+            rmmap[x,y]=1
+            rmmap[x,y+1]=1
+            rmmap[x,y+2]=1
+        if x < self.width-2:
+          if self.map.get((x,y)) == self.map.get((x+1,y)) == self.map.get((x+2,y)):
+            rmmap[x,y]=1
+            rmmap[x+1,y]=1
+            rmmap[x+2,y]=1
+    for x in xrange(self.width):
+      for y in xrange(self.height):
+        if (x,y) in rmmap:
+          winners+=1
+          self.place(x,y,None)
     #self.screen.fill(0)
     self.redraw()
     pygame.display.flip()
-    return r
+    return winners
 
   def redraw(self):
     self.drawcb(self.screen,self.gems,self.map,self.width,self.height)
@@ -95,6 +94,8 @@ class field(object):
     self.redraw()
     pygame.display.flip()
     pygame.time.delay(150)
-    if self.check_for_winners():
-      return
+    winners=self.check_for_winners()
+    if winners:
+      return winners
     swaps()
+    return 0

@@ -19,18 +19,6 @@ def separate_gems(gems):
     ng.append(s)
   return ng
 
-def drawcb(s,g,m,w,h):
-  global gemsize
-  size=g[0].get_width()
-  s.blit(bg,(0,0))
-  s.blit(cursor,(xoffset+gemsize*xcurs,yoffset+gemsize*ycurs))
-  for x in xrange(w):
-    for y in xrange(h):
-      s.blit(gems[m.get((x,y), 0)],(xoffset+x*size,yoffset+y*size))
-  pygame.display.flip()
-
-
-
 pygame.init()
 pygame.mouse.set_visible(0)
 screen=pygame.display.set_mode((320,240),0,32)
@@ -41,10 +29,26 @@ gemsize=gems[0].get_width()
 grey=(75,75,75)
 cursor=pygame.Surface((gemsize,gemsize)).convert_alpha()
 cursor.fill(grey)
+font = pygame.font.Font(None, 24)
+
+score=0
+
+def drawcb(s,g,m,w,h):
+  global gemsize
+  size=g[0].get_width()
+  s.blit(bg,(0,0))
+  s.blit(cursor,(xoffset+gemsize*xcurs,yoffset+gemsize*ycurs))
+  for x in xrange(w):
+    for y in xrange(h):
+      s.blit(gems[m.get((x,y), 0)],(xoffset+x*size,yoffset+y*size))
+  screen.blit(font.render("%d" % score, 1, (255, 255, 255)), (15, 3))
+  pygame.display.flip()
+
 f = field(8,8,len(gems)-1,gems,screen,drawcb)
 
 while f.check_for_winners():
   f.fill()
+
 while 1:
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
@@ -65,14 +69,18 @@ while 1:
         if xcurs < 7:
           xcurs += 1
       if event.key == pygame.K_LCTRL:
-        f.check_swap(xcurs,ycurs,'r')
+        score+=f.check_swap(xcurs,ycurs,'r')
       if event.key == pygame.K_LSHIFT:
-        f.check_swap(xcurs,ycurs,'l')
+        score+=f.check_swap(xcurs,ycurs,'l')
       if event.key == pygame.K_SPACE:
-        f.check_swap(xcurs,ycurs,'u')
+        score+=f.check_swap(xcurs,ycurs,'u')
       if event.key == pygame.K_LALT:
-        f.check_swap(xcurs,ycurs,'d')
-    while f.check_for_winners():
+        score+=f.check_swap(xcurs,ycurs,'d')
+    while True:
+      new_score=f.check_for_winners()
+      if not new_score:
+        break
+      score+=new_score
       f.fill()
     f.redraw()
     #screen.blit(cursor,(gemsize*xcurs,gemsize*ycurs))
