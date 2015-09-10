@@ -15,11 +15,18 @@ class field(object):
     self.ngems=ngems
     self.width=width
     self.height=height
-    self.map=[ [0]*height for i in xrange(width)]
+    self.map={}
     self.drawcb=drawcb
     if not drawcb:
       self.drawcb=donothing
     self.fill()
+
+  def place(self, x, y, v):
+    if v is None:
+      if (x,y) in self.map:
+        del self.map[x,y]
+    else:
+       self.map[x,y]=v
 
   def fill(self):
     done=False
@@ -27,98 +34,67 @@ class field(object):
       done=True
       for x in xrange(self.width):
         for y in reversed(xrange(1,self.height,1)):
-          if self.map[x][y]==0:
+          if not (x,y) in self.map:
             done=False
-            self.map[x][y]=self.map[x][y-1]
-            self.map[x][y-1]=0
+            self.place(x,y,self.map.get((x,y-1)))
+            self.place(x,y-1,None)
       for x in xrange(self.width):
-        if self.map[x][0] == 0:
+        if not (x,0) in self.map:
           done=False
-          self.map[x][0] = random.randint(1,self.ngems)
-      self.drawcb(self.screen,self.gems,self.map)
+          self.map[x,0] = random.randint(1,self.ngems)
+      self.drawcb(self.screen,self.gems,self.map,self.width,self.height)
       pygame.time.delay(100)
-  
+
   def check_for_winners(self):
     done=False
     r=False
     while not done:
-      rmmap=[ [0]*self.height for i in xrange(self.width)]
+      rmmap={}
       done=True
       for x in xrange(self.width):
         for y in xrange(self.height):
           if y < self.height-2:
-            if self.map[x][y] == self.map[x][y+1] == self.map[x][y+2]:
-              rmmap[x][y]=1
-              rmmap[x][y+1]=1
-              rmmap[x][y+2]=1
+            if self.map.get((x,y)) == self.map.get((x,y+1)) == self.map.get((x,y+2)):
+              rmmap[x,y]=1
+              rmmap[x,y+1]=1
+              rmmap[x,y+2]=1
           if x < self.width-2:
-            if self.map[x][y] == self.map[x+1][y] == self.map[x+2][y]:
-              rmmap[x][y]=1
-              rmmap[x+1][y]=1
-              rmmap[x+2][y]=1
+            if self.map.get((x,y)) == self.map.get((x+1,y)) == self.map.get((x+2,y)):
+              rmmap[x,y]=1
+              rmmap[x+1,y]=1
+              rmmap[x+2,y]=1
       for x in xrange(self.width):
         for y in xrange(self.height):
-          if rmmap[x][y]:
+          if (x,y) in rmmap:
             r = True
-            self.map[x][y] = 0
+            self.place(x,y,None)
     #self.screen.fill(0)
     self.redraw()
     pygame.display.flip()
     return r
 
   def redraw(self):
-    self.drawcb(self.screen,self.gems,self.map)
+    self.drawcb(self.screen,self.gems,self.map,self.width,self.height)
 
   def check_swap(self,x,y,d):
-    if d == 'u':
-      if y == 0:
-        return
-      t=self.map[x][y]
-      self.map[x][y]=self.map[x][y-1]
-      self.map[x][y-1]=t
-    
-    if d == 'd':
-      if y == 7:
-        return
-      t=self.map[x][y]
-      self.map[x][y]=self.map[x][y+1]
-      self.map[x][y+1]=t
-    
-    if d == 'l':
-      if x == 0:
-        return
-      t=self.map[x][y]
-      self.map[x][y]=self.map[x-1][y]
-      self.map[x-1][y]=t
-    if d == 'r':
-      if x == 7:
-        return
-      t=self.map[x][y]
-      self.map[x][y]=self.map[x+1][y]
-      self.map[x+1][y]=t
-    
-      
+    def swap(u, v):
+      t=self.map.get((x,y))
+      s=self.map.get((x+u,y+v))
+      self.place(x,y,s)
+      self.place(x+u,y+v,t)
+    def swaps():
+      if d == 'u' and y > 0:
+        swap(0, -1)
+      if d == 'd' and y < 7:
+        swap(0, 1)
+      if d == 'l' and x > 0:
+        swap(-1, 0)
+      if d == 'r' and x < 7:
+        swap(1, 0)
+    swaps()    
     self.redraw()
     pygame.display.flip()
     pygame.time.delay(150)
     if self.check_for_winners():
       return
-    if d == 'u':
-      t=self.map[x][y]
-      self.map[x][y]=self.map[x][y-1]
-      self.map[x][y-1]=t
-      
-    if d == 'd':
-      t=self.map[x][y]
-      self.map[x][y]=self.map[x][y+1]
-      self.map[x][y+1]=t
-      
-    if d == 'l':
-      t=self.map[x][y]
-      self.map[x][y]=self.map[x-1][y]
-      self.map[x-1][y]=t
-      
-    if d == 'r':
-      t=self.map[x][y]
-      self.map[x][y]=self.map[x+1][y]
-      self.map[x+1][y]=t
+    swaps()
