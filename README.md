@@ -11,8 +11,8 @@ then use A/B/X/Y to swap the current highlighted gem with another gem in the but
 Building
 --------
 Invoking 
-'''
+```bash
 make
-'''
+```
 will re-create the GCW-Zero's OPK file for the game. Note that this is basically just loading all the files from the game folder into a squashfs volume and then renaming the squashfs volume's file extension to .opk.
 
