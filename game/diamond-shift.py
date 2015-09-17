@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import sys
 import pygame
 from field import field
 
@@ -30,32 +31,28 @@ grey=(75,75,75)
 cursor=pygame.Surface((gemsize,gemsize)).convert_alpha()
 cursor.fill(grey)
 font = pygame.font.Font(None, 24)
-
 score=0
 
-def drawcb(s,g,m,w,h):
+def draw_field(s, gems, f):
   global gemsize
-  size=g[0].get_width()
+  size = gems[0].get_width()
   s.blit(bg,(0,0))
-  s.blit(cursor,(xoffset+gemsize*xcurs,yoffset+gemsize*ycurs))
-  for x in xrange(w):
-    for y in xrange(h):
-      s.blit(gems[m.get((x,y), 0)],(xoffset+x*size,yoffset+y*size))
+  s.blit(cursor, (xoffset + gemsize * xcurs, yoffset + gemsize * ycurs))
+  for x in xrange(f.width):
+    for y in xrange(f.height):
+      s.blit(gems[f.map.get((x, y), 0)],(xoffset + x* size, yoffset + y * size))
   screen.blit(font.render("%d" % score, 1, (255, 255, 255)), (15, 3))
   pygame.display.flip()
 
-f = field(8,8,len(gems)-1,gems,screen,drawcb)
+f = field(8, 8, len(gems) - 1)
 
-while f.check_for_winners():
-  f.fill()
-
-while 1:
+while True:
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
-      import sys; sys.exit()
+      sys.exit()
     if event.type == pygame.KEYDOWN:
       if event.key == pygame.K_ESCAPE:
-        import sys; sys.exit()
+        sys.exit()
       if event.key ==  pygame.K_UP:
         if ycurs > 0:
           ycurs -= 1
@@ -68,20 +65,42 @@ while 1:
       if event.key == pygame.K_RIGHT:
         if xcurs < 7:
           xcurs += 1
+      d = None
       if event.key == pygame.K_LCTRL:
-        score+=f.check_swap(xcurs,ycurs,'r')
-      if event.key == pygame.K_LSHIFT:
-        score+=f.check_swap(xcurs,ycurs,'l')
-      if event.key == pygame.K_SPACE:
-        score+=f.check_swap(xcurs,ycurs,'u')
-      if event.key == pygame.K_LALT:
-        score+=f.check_swap(xcurs,ycurs,'d')
+        d = 'r'
+      elif event.key == pygame.K_LSHIFT:
+        d = 'l'
+      elif event.key == pygame.K_SPACE:
+        d = 'u'
+      elif event.key == pygame.K_LALT:
+        d = 'd'
+      if d:
+        f.swaps(xcurs, ycurs, d)
+        draw_field(screen, gems, f)
+        pygame.display.flip()
+        pygame.time.delay(150)
+        winners = f.find_winners()
+        draw_field(screen, gems, f)
+        pygame.display.flip()
+        if winners:
+          score += len(winners)
+        else:
+          f.swaps(xcurs, ycurs, d)
     while True:
-      new_score=f.check_for_winners()
+      winners = f.find_winners()
+      f.clear(winners)
+      new_score = len(winners)
+      draw_field(screen, gems, f)
+      pygame.display.flip()
       if not new_score:
         break
       score+=new_score
-      f.fill()
-    f.redraw()
-    #screen.blit(cursor,(gemsize*xcurs,gemsize*ycurs))
+      draw_field(screen, gems, f)
+      loop = True
+      while loop:
+        loop = f.fall()
+        loop = f.pour() or loop
+        draw_field(screen, gems, f)
+        pygame.display.flip()
+        pygame.time.delay(150)
     pygame.display.flip()
