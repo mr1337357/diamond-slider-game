@@ -1,11 +1,7 @@
 import random
 import pygame
 
-# game field
-# 2D list with numbers representing gem types
-# index as field[x][y] where x is steps from left, y is steps from top
-
-class field(object):
+class Field(object):
   def __init__(self, width, height, ngems):
     self.ngems = ngems
     self.width = width
