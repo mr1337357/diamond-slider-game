@@ -149,5 +149,7 @@ class DiamondShift:
       ng.append(s)
     return ng
 
-game = DiamondShift()
-game.run()
+if __name__ == '__main__':
+  game = DiamondShift()
+  game.run()
+
