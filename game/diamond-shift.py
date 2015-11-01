@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import sys
 import pygame
 from field import Field
@@ -117,7 +117,9 @@ class DiamondShift:
       delay = 150
       
     elif self.state == 'score':
-      self.score += len(self.winners)
+      def score(n):
+        return (n - 1)**2
+      self.score += score(len(self.winners))
       self.field.clear(self.winners)
       self.state = 'fill'
       delay = 150
