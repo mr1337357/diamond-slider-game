@@ -38,13 +38,13 @@ def update(ctrl):
       if event.key == pygame.K_RIGHT:
         if ctrl.pos.x < ctrl.dim.x:
           ctrl.pos.x += 1
-      if event.key == pygame.K_LCTRL:
+      if event.key in (pygame.K_LCTRL, pygame.K_d):
         ctrl.direction = 'r'
-      elif event.key == pygame.K_LSHIFT:
+      elif event.key in (pygame.K_LSHIFT, pygame.K_a):
         ctrl.direction = 'l'
-      elif event.key == pygame.K_SPACE:
+      elif event.key in (pygame.K_SPACE, pygame.K_w):
         ctrl.direction = 'u'
-      elif event.key == pygame.K_LALT:
+      elif event.key in (pygame.K_LALT, pygame.K_s):
         ctrl.direction = 'd'
 
 class DiamondShift:
@@ -117,7 +117,9 @@ class DiamondShift:
       delay = 150
       
     elif self.state == 'score':
-      self.score += len(self.winners)
+      def score(n):
+        return (n - 1)**2
+      self.score += score(len(self.winners))
       self.field.clear(self.winners)
       self.state = 'fill'
       delay = 150
@@ -147,5 +149,7 @@ class DiamondShift:
       ng.append(s)
     return ng
 
-game = DiamondShift()
-game.run()
+if __name__ == '__main__':
+  game = DiamondShift()
+  game.run()
+
