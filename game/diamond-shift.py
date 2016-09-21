@@ -63,7 +63,7 @@ class DiamondShift:
     self.score = 0
     self.field = Field(8, 8, len(self.gems) - 1)
     self.ctrl = Control(Point(7, 7))
-    self.state = 'standby' # | swap | swap-back | fill | check | score
+    self.state = 'fill' # | swap | swap-back | fill | check | score
     self.swap = None 
     self.winners = None
 
