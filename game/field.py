@@ -7,7 +7,7 @@ class Field(object):
     self.width = width
     self.height = height
     self.map = {}
-    self.fill()
+    #self.fill()
 
   def clear(self, winners):
     for winner in winners:
